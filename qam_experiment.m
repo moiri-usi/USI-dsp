@@ -27,7 +27,6 @@ for k=1:length(lut)
     text(real(lut(k)), imag(lut(k)), dec2bin(k-1,6), 'horizontal', 'left', 'vertical', 'bottom');
 end
 
-
 y_demod = qam_demod(y_n, N);
 
 [bit_cnt bit_err_cnt ratio] = ber(x, y_demod);

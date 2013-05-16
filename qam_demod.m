@@ -1,13 +1,16 @@
 function [y] = qam_demod(x, N)
 run('lut');
 M=2^N;
-% round to nearest odd integer.
 
+% round to nearest odd integer.
 x = 2*fix(real(x)/2)+sign(real(x)) + (2*fix(imag(x)/2)+sign(imag(x)))*i;
+
+% limit to possible values
 max_val = 2^(N/2)-1;
 min_val = -2^(N/2)+1;
 x = max(real(x), min_val) + i*max(imag(x),min_val);
 x = min(real(x), max_val) + i*min(imag(x),max_val);
+
 %x = round(x);
 if (M==4),
     [val idx_lut] = ismember(x,lut4);
