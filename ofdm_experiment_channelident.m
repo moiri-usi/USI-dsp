@@ -5,7 +5,7 @@ N = input('Enter the length of the window: ');
 snr = input('Enter the signal to noise ratio: ');
 %snr = inf;
 L = input('Enter the order of the channel: ');
-Nn = input('Enter the number of QAM elements (3, 5, 9, 17, ...): ');
+Nn = input('Enter the number of QAM elements (3, 7, 15, ...): ');
 Ncp = input('Enter the length of the cyclic prefix (Lcp >= L): ');
 
 x = round(rand(1,rand_seq_len));
@@ -25,20 +25,31 @@ end
 
 Nl = length(y_qam)/Nn;
 
-y_pack = reshape(y_qam, Nn, Nl);
-y_pack = [zeros(1,Nl); y_pack; zeros(1,Nl); flipud(y_pack.'')];
+y_pack_cut = reshape(y_qam, Nn, Nl);
+y_pack = [zeros(1,Nl); y_pack_cut; zeros(1,Nl); flipud(y_pack_cut.'')];
 
 [y_serial y_ifft] = ofdm_mod(y_pack, Ncp);
 
 y_n = awgn(y_serial, snr);
 
-y_ch = filter(randn(1,L),1 ,y_n);
+% coeff = use values from exercise 2-2 2-3
+coeff = randn(1,L);
+y_ch = filter(coeff, 1, y_n);
 
 [y_demod_ofdm y_resh y_cut] = ofdm_demod(y_ch, Nn, Nl, Ncp);
 
 y_demod_ofdm_cut = y_demod_ofdm(2:Nn+1,:);
 
-[y y_qam_r] = qam_demod(y_demod_ofdm_cut, N);
+ch_f_cut = y_demod_ofdm_cut./y_pack_cut;
 
-[bit_cnt bit_err_cnt ratio] = ber(x_norm, y);
-fprintf('the bit error ratio (BER) is: %d/%d=%d\n', bit_err_cnt, bit_cnt, ratio);
+ch_f = [zeros(1,Nl); ch_f_cut; zeros(1,Nl); flipud(ch_f_cut.'')];
+
+ch_f_av = sum(ch_f.').'/length(ch_f(1,:));
+
+ch_t = ifft(ch_f_av);
+
+coeff = [coeff zeros(1,length(ch_t(:,1))-length(coeff))];
+subplot(2, 1, 1);
+plot(coeff);
+subplot(2, 1, 2);
+plot(ch_t);
