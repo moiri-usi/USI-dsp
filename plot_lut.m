@@ -1,16 +1,15 @@
-lut4 = [-1+i -1-i 1+i 1-i];
+function [] = plot_lut(lut)
 
-lut16 = [((real(lut4)-2) + (imag(lut4)+2)*i)...
-        ((real(lut4)-2) - (imag(lut4)+2)*i)...
-        (-(real(lut4)-2) + (imag(lut4)+2)*i)...
-        (-(real(lut4)-2) - (imag(lut4)+2)*i)];
-
-lut64 = [((real(lut16)-4) + (imag(lut16)+4)*i)...
-         ((real(lut16)-4) - (imag(lut16)+4)*i)...
-         (-(real(lut16)-4) + (imag(lut16)+4)*i)...
-         (-(real(lut16)-4) - (imag(lut16)+4)*i)];
-     
-scatter(real(lut64),imag(lut64), 'filled');
-for k=1:length(lut64)
-    text(real(lut64(k)), imag(lut64(k)), dec2bin(k-1,6), 'horizontal', 'left', 'vertical', 'bottom');
+M = length(lut);
+scatter(real(lut), imag(lut), 'filled');
+grid on;
+ax = sqrt(M);
+axis([-ax ax -ax ax]);
+for k=1:M
+    text(real(lut(k)), imag(lut(k)), dec2bin(k-1,log2(M)),...
+        'horizontalalignment', 'center', ...
+        'verticalalignment', 'middle');
 end
+title('Scatter plot');
+xlabel('In-Phase');
+ylabel('Quadrature');
