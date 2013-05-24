@@ -1,7 +1,7 @@
 clear;
 
 rand_seq_len = input('Enter the length of the pseudo random binary sequence: ');
-N = input('Enter the length of the window: ');
+N = input('Enter the length of the window (2, 4 or 6): ');
 snr = input('Enter the signal to noise ratio: ');
 %snr = inf;
 L = input('Enter the order of the channel: ');
@@ -26,7 +26,7 @@ end
 Nl = length(y_qam)/Nn;
 
 y_pack_cut = reshape(y_qam, Nn, Nl);
-y_pack = [zeros(1,Nl); y_pack_cut; zeros(1,Nl); flipud(y_pack_cut.'')];
+y_pack = [zeros(1,Nl); y_pack_cut; zeros(1,Nl); flipud(conj(y_pack_cut))];
 
 [y_serial y_ifft] = ofdm_mod(y_pack, Ncp);
 
@@ -42,11 +42,11 @@ y_demod_ofdm_cut = y_demod_ofdm(2:Nn+1,:);
 
 ch_f_cut = y_demod_ofdm_cut./y_pack_cut;
 
-ch_f = [zeros(1,Nl); ch_f_cut; zeros(1,Nl); flipud(ch_f_cut.'')];
+ch_f = [zeros(1,Nl); ch_f_cut; zeros(1,Nl); flipud(conj(ch_f_cut))];
 
 ch_f_av = sum(ch_f.').'/length(ch_f(1,:));
 
-ch_t = ifft(ch_f_av);
+ch_t = real(ifft(ch_f_av));
 
 coeff = [coeff zeros(1,length(ch_t(:,1))-length(coeff))];
 subplot(2, 1, 1);

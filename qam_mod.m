@@ -1,5 +1,5 @@
 function [y lut] = qam_mod(x, N)
-run('lut');
+run('lut.m');
 M = 2^N;
 
 if M == 4,

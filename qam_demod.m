@@ -1,5 +1,5 @@
-function [y x_round] = qam_demod(x, N)
-run('lut');
+function [y x_round idx_lut] = qam_demod(x, N)
+run('lut.m');
 M=2^N;
 
 % round to nearest odd integer.
@@ -22,7 +22,9 @@ if (M==64),
     lut = lut64;
 end
 
-[val idx_lut] = ismember(x_round,lut);
+% just a hack because octave has a bug with ismember and complex numbers
+[val idx_lut] = ismember(abs(x_round)+angle(x_round),abs(lut)+angle(lut));
+%[val idx_lut] = ismember(x_round, lut);
 
 y = de2bi(idx_lut-1, N,'left-msb')';
 y = y';
