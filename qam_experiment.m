@@ -5,6 +5,8 @@ rand_seq_len = input(...
     'Enter the length of the pseudo random binary sequence: ');
 N = input('Enter the length of the window: ');
 snr = input('Enter the signal to noise ratio: ');
+
+% generate bitstream
 x = round(rand(1,rand_seq_len));
 
 % add zeros to the end of the stream
