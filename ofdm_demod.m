@@ -1,6 +1,7 @@
 function [y y_resh y_cut] = ofdm_demod(x, Nn, Nl, Ncp)
 
-y_resh = reshape(x, 2*(Nn+1)+Ncp, Nl);
+f_len = 2*(Nn+1)+Ncp;
+y_resh = reshape(x, f_len, length(x)/f_len);
 y_cut = y_resh(Ncp+1:end,:);
 y = fft(y_cut);
 
