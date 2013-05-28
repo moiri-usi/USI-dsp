@@ -24,7 +24,7 @@ t_arr = 0:1/fs:t_sim;
 % x = x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8;
 
 % EXERCISE 2-1
-x = zeros(1,fs*t_sim+1);
+x = zeros(1,fs*t_sim);
 x(fs*2) = 1;
 x(fs*3) = 1;
 

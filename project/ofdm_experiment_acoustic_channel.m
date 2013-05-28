@@ -1,11 +1,12 @@
 % set parameter 
 %%%%%%%%%%%%%%%%
 %snr = input('Enter the signal to noise ratio: ');
-fs = 16000; % sampling frequency
-t_sim = 5;  % simulation time (measure frequency missmatch and noise)
+fs = 32000; % sampling frequency
+%t_sim = 5;  % simulation time (measure frequency missmatch and noise)
 Nt = 5;     % number of training frames per package
 Nl = 20;    % number of data frames per package
 M = 6;      % QAM constellation order
+t_delay = 40000; % aprroximate delay of channel (in elements)
 
 % measure sampling ferquency missmatch
 % measure noise
@@ -70,11 +71,17 @@ y_pack = [zeros(1,Nf_tot); y_pack_cut; zeros(1,Nf_tot);...
     flipud(conj(y_pack_cut))];          % consecutive packages ofdm
 
 % ofdm modulation
-[data_in, y_ifft] = ofdm_mod(y_pack, Ncp);
+[y_ofdm, y_ifft] = ofdm_mod(y_pack, Ncp);
+
+% prepare signal to transmit
+y_ofdm_z = [y_ofdm zeros(1, t_delay)];
+t_sim = (length(y_ofdm_z)-1)/fs;
+t_arr = 0:1/fs:t_sim;
+data_in = [t_arr' y_ofdm_z'];
 
 % send through the channel
-%sim('audio_io.mdl');
-data_out = acoustic_channel_tv(data_in);
+sim('audio_io.mdl');
+%data_out = acoustic_channel_tv(data_in);
 % 
 % % add noise
 % y_n = awgn(data_in, snr);
@@ -83,8 +90,20 @@ data_out = acoustic_channel_tv(data_in);
 % coeff = randn(1,L);
 % data_out = filter(coeff, 1, y_n);
 
+% get the actal signal
+n_lvl_max = max(data_out(1:t_delay/2));
+data_idx_max = find(data_out > 1.5*n_lvl_max);
+n_lvl_min = min(data_out(1:t_delay/2));
+data_idx_min = find(data_out < 1.5*n_lvl_min);
+data_out_cut = data_out(min(data_idx_max(1),data_idx_min(1)):...
+    max(data_idx_max(end),data_idx_min(end)));
+
+% adapt due to frequency difference
+% CHEATING!!! we dont know length(y_ofdm)
+data_out_cut = data_out_cut(1:length(y_ofdm));
+
 % ofdm demodulation
-[y_demod_ofdm, y_resh, y_cut] = ofdm_demod(data_out, Nn, Nl, Ncp);
+[y_demod_ofdm, y_resh, y_cut] = ofdm_demod(data_out_cut, Nn, Nl, Ncp);
 
 % equalize
 y_comp = eq_zf(y_demod_ofdm, y_block_t, Nn, Nt, Nl);
@@ -97,6 +116,7 @@ y_comp = eq_zf(y_demod_ofdm, y_block_t, Nn, Nt, Nl);
 fprintf('the bit error ratio (BER) is: %d/%d=%f\n',...
     bit_err_cnt, bit_cnt, ratio);
 
+% CHEATING! we don't know zero_count
 y_final = y(1:end-zero_count);
 
 % calculate symbol error rate (SER)
