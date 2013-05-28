@@ -29,7 +29,7 @@ Ncp = L + 10;               % calculation of cyclic prefix size
 
 % get bitstream from input file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-img_in = imread('image_in.jpg');
+img_in = imread('img/image_in.jpg');
 [img_row img_col img_color] = size(img_in);
 img_bin_in = de2bi(img_in);
 x = img_bin(:);
@@ -95,4 +95,4 @@ fprintf('the symbol error ratio (SER) is: %d/%d=%f\n',...
 img_bin_out = reshape(y_qam_demod, [], 8);
 img_dec_out = bi2de(img_bin_out);
 img_res_out = reshape(img_dec_out, img_ro, img_col, img_color);
-imwrite(img_res_out, 'image_out.jpg');
+imwrite(img_res_out, 'img/image_out.jpg');
