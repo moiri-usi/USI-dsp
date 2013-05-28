@@ -6,7 +6,7 @@ N = input('Enter the length of the window (2, 4 or 6): ');
 snr = input('Enter the signal to noise ratio: ');
 L = input('Enter the order of the channel: ');
 Nn = 2^ceil(log2(L)) - 1;
-Ncp = L + 1;
+Ncp = L + 10;
 Nl = input('Enter the number of frames per data package: ');
 Nt = input('Enter the number of training frames per data packages: ');
 
