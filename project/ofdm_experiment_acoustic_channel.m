@@ -104,11 +104,9 @@ y_final = y(1:end-zero_count);
 fprintf('the symbol error ratio (SER) is: %d/%d=%f\n',...
     symb_err_cnt, symb_cnt, ratio);
 
-
-
 % save bitstream to output file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-img_bin_out = reshape(x, [], 8);
+img_bin_out = reshape(y_final, [], 8);
 img_dec_out = bi2de(img_bin_out);
 img_res_out = reshape(img_dec_out, img_row, img_col, img_color);
 imwrite(img_res_out, 'img/image_out.jpg');
