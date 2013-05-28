@@ -57,6 +57,9 @@ y_ch = filter(coeff, 1, y_n);
 % ofdm demodulation
 [y_demod_ofdm y_resh y_cut] = ofdm_demod(y_ch, Nn, Nl, Ncp);
 
+%%%%%%%%%%%%%%%%%%%
+% Equalizer Start %
+
 % remove redundant parts of ofdm package
 y_demod_ofdm_cut = y_demod_ofdm(2:Nn+1,:);          % Nn by Np_tot*(Nt+Nl)
 
@@ -78,6 +81,9 @@ y_dor_comp = y_dor_l./repmat(ch_f_dor_av, 1, Nl);   % Nl by Np_tot*Nn
 % reshape package
 y_comp = reshape(permute(...                        % Nn by Np_tot*Nl
     reshape(y_dor_comp, Nn, [], Nl), [1 3 2]), Nn, []);
+
+% Equalizer End %
+%%%%%%%%%%%%%%%%%
 
 % qam demodulation
 [y y_qam_r] = qam_demod(y_comp, N);
