@@ -8,7 +8,7 @@ x_out = double(x);
 max_out_idx = 0;
 while length(max_out_idx) < 2,
     tolerance = tolerance - d_tolerance;
-    max_out_idx = find(x_out < tolerance*max(x_out));
+    max_out_idx = find(x_out > tolerance*max(x_out));
 end;
 
 % calculate frequency delta
@@ -19,5 +19,7 @@ delta_f = abs(delta_out - fs);
 noise_lvl = max(abs(x_out(1:max_out_idx(1)-1000)));
 
 % measure the response time
-resp_t_arr = find(x_out((max_out_idx(1)-100):end) > noise_lvl);
+start_idx = max_out_idx(end)-1000;
+resp_t_arr = find(x_out(start_idx:end) > 2*noise_lvl);
+resp_t_arr = resp_t_arr + start_idx;
 resp_t_fct = x_out(resp_t_arr(1):resp_t_arr(end));
