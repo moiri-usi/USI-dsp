@@ -41,7 +41,7 @@ x = img_bin_in(:);
 
 % normalize bitstream (add zeroes)
 Ns_pack = Nn*M*Nl;
-x = [x' [1 1] zeros(1, N-2)];
+x = [x' [1 1] zeros(1, M-2)];
 x_norm = x;
 zero_count = Ns_pack-rem(length(x), Ns_pack);
 if (rem(length(x), Ns_pack) > 0),
