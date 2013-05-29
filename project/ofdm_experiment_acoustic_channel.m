@@ -1,13 +1,13 @@
 % set parameter 
 %%%%%%%%%%%%%%%%
 %snr = input('Enter the signal to noise ratio: ');
-fs = 16000; % sampling frequency
-%t_sim = 5;  % simulation time (measure frequency missmatch and noise)
-Nt = 5;     % number of training frames per package
-Nl = 20;    % number of data frames per package
-M = 6;      % QAM constellation order
-t_delay = 20000; % aprroximate delay of channel (in elements)
-t_init = 50000;
+fs = 16000;      % sampling frequency
+%t_sim = 5;      % simulation time (measure frequency missmatch and noise)
+Nt = 5;          % number of training frames per package
+Nl = 20;         % number of data frames per package
+M = 6;           % QAM constellation order
+t_delay = 2*fs;  % aprroximate delay of channel (in elements)
+t_init = 4*fs;   % initial sequence to be able to ignore simuling effects
 
 % measure sampling ferquency missmatch
 % measure noise
@@ -41,10 +41,11 @@ x = img_bin_in(:);
 
 % normalize bitstream (add zeroes)
 Ns_pack = Nn*M*Nl;
+x = [x' [1 1] zeros(1, N-2)];
 x_norm = x;
 zero_count = Ns_pack-rem(length(x), Ns_pack);
 if (rem(length(x), Ns_pack) > 0),
-    x_norm = [x' zeros(1, zero_count)];
+    x_norm = [x zeros(1, zero_count)];
 end
 
 % generate training stream
@@ -117,8 +118,9 @@ y_comp = eq_mmse(y_demod_ofdm, y_block_t, Nn, Nt, Nl);
 fprintf('the bit error ratio (BER) is: %d/%d=%f\n',...
     bit_err_cnt, bit_cnt, ratio);
 
-% CHEATING! we don't know zero_count
-y_final = y(1:end-zero_count);
+% remove the zeroes at the end (used to normalize the input)
+y_end_idx = find(sum(reshape(x,N,[]))>1);
+y_final = y(1:(y_end_idx(end)-1)*N);
 
 % calculate symbol error rate (SER)
 [symb_cnt, symb_err_cnt, ratio] = ser(y_qam_l.', y_qam_r(:));
