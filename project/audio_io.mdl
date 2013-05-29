@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.28"
+    ComputedModelVersion    "1.30"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -30,7 +30,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [373.0, 67.0, 584.0, 524.0]
+      Location		      [353.0, 18.0, 624.0, 618.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -54,7 +54,7 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[528.0, 337.0]
+	Extents			[568.0, 431.0]
 	ZoomFactor		[1.0]
 	Offset			[0.0, 0.0]
       }
@@ -66,9 +66,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "root"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Tue May 28 22:11:27 2013"
-  RTWModifiedTimeStamp	  291679882
-  ModelVersionFormat	  "1.%<AutoIncrement:28>"
+  LastModifiedDate	  "Wed May 29 11:09:16 2013"
+  RTWModifiedTimeStamp	  291726543
+  ModelVersionFormat	  "1.%<AutoIncrement:30>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -661,7 +661,7 @@ Model {
       }
       Name		      "Configuration"
       CurrentDlgPage	      "Solver"
-      ConfigPrmDlgPosition     [ 218, 91, 1148, 650 ] 
+      ConfigPrmDlgPosition     [ 208, 54, 1158, 660 ] 
     }
     PropName		    "ConfigurationSets"
   }
@@ -741,19 +741,19 @@ Model {
       OutputAfterFinalValue   "Extrapolation"
     }
     Block {
-      BlockType		      ToWorkspace
+      BlockType		      SignalToWorkspace
       VariableName	      "simulink_output"
       MaxDataPoints	      "1000"
       Decimation	      "1"
-      SampleTime	      "0"
       SaveFormat	      "Array"
+      Save2DMode	      "2-D array (concatenate along first dimension)"
       FixptAsFi		      off
       NumInputs		      "1"
     }
   }
   System {
     Name		    "audio_io"
-    Location		    [373, 67, 957, 591]
+    Location		    [353, 18, 977, 636]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -767,7 +767,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "7"
+    SIDHighWatermark	    "8"
     Block {
       BlockType		      FromWorkspace
       Name		      "From\nWorkspace"
@@ -796,7 +796,7 @@ Model {
       bufferSize	      "4096"
       queueDuration	      "1"
       frameSize		      "1024"
-      outputDatatype	      "single"
+      outputDatatype	      "double"
     }
     Block {
       BlockType		      Reference
@@ -817,15 +817,19 @@ Model {
       queueDuration	      "1"
     }
     Block {
-      BlockType		      ToWorkspace
+      BlockType		      SignalToWorkspace
       Name		      "To Workspace"
-      SID		      "4"
+      SID		      "8"
       Ports		      [1]
       Position		      [430, 145, 490, 175]
-      ZOrder		      -4
+      ZOrder		      1
       VariableName	      "data_out"
       MaxDataPoints	      "inf"
-      SampleTime	      "-1"
+      Object {
+	$PropName		"MaskObject"
+	$ObjectID		19
+	$ClassName		"Simulink.Mask"
+      }
     }
     Line {
       SrcBlock		      "From\nWorkspace"

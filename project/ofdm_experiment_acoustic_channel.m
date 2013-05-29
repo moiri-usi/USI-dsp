@@ -1,12 +1,13 @@
 % set parameter 
 %%%%%%%%%%%%%%%%
 %snr = input('Enter the signal to noise ratio: ');
-fs = 32000; % sampling frequency
+fs = 16000; % sampling frequency
 %t_sim = 5;  % simulation time (measure frequency missmatch and noise)
 Nt = 5;     % number of training frames per package
 Nl = 20;    % number of data frames per package
 M = 6;      % QAM constellation order
-t_delay = 40000; % aprroximate delay of channel (in elements)
+t_delay = 20000; % aprroximate delay of channel (in elements)
+t_init = 50000;
 
 % measure sampling ferquency missmatch
 % measure noise
@@ -74,7 +75,7 @@ y_pack = [zeros(1,Nf_tot); y_pack_cut; zeros(1,Nf_tot);...
 [y_ofdm, y_ifft] = ofdm_mod(y_pack, Ncp);
 
 % prepare signal to transmit
-y_ofdm_z = [y_ofdm zeros(1, t_delay)];
+y_ofdm_z = [zeros(1, t_init) y_ofdm zeros(1, t_delay)];
 t_sim = (length(y_ofdm_z)-1)/fs;
 t_arr = 0:1/fs:t_sim;
 data_in = [t_arr' y_ofdm_z'];
@@ -91,12 +92,12 @@ sim('audio_io.mdl');
 % data_out = filter(coeff, 1, y_n);
 
 % get the actal signal
-n_lvl_max = max(data_out(1:t_delay/2));
-data_idx_max = find(data_out > 1.5*n_lvl_max);
-n_lvl_min = min(data_out(1:t_delay/2));
-data_idx_min = find(data_out < 1.5*n_lvl_min);
-data_out_cut = data_out(min(data_idx_max(1),data_idx_min(1)):...
-    max(data_idx_max(end),data_idx_min(end)));
+n_lvl_max = max(data_out(t_init:t_init+t_delay/2));
+data_idx_max = find(data_out(t_init:end) > 3*n_lvl_max);
+n_lvl_min = min(data_out(t_init:t_init+t_delay/2));
+data_idx_min = find(data_out(t_init:end) < 3*n_lvl_min);
+data_out_cut = data_out(t_init+min(data_idx_max(1),data_idx_min(1)):...
+    t_init+max(data_idx_max(end),data_idx_min(end)));
 
 % adapt due to frequency difference
 % CHEATING!!! we dont know length(y_ofdm)
@@ -130,3 +131,4 @@ img_bin_out = reshape(y_final, [], 8);
 img_dec_out = bi2de(img_bin_out);
 img_res_out = reshape(img_dec_out, img_row, img_col, img_color);
 imwrite(uint8(img_res_out), 'img/image_out.jpg');
+
