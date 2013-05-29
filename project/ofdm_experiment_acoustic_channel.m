@@ -106,7 +106,7 @@ data_out_cut = data_out_cut(1:length(y_ofdm));
 [y_demod_ofdm, y_resh, y_cut] = ofdm_demod(data_out_cut, Nn, Nl, Ncp);
 
 % equalize
-y_comp = eq_zf(y_demod_ofdm, y_block_t, Nn, Nt, Nl);
+y_comp = eq_mmse(y_demod_ofdm, y_block_t, Nn, Nt, Nl);
 
 % qam demodulation
 [y, y_qam_r] = qam_demod(y_comp, M);
