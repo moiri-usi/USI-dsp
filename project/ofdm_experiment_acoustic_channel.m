@@ -2,7 +2,7 @@ clear;
 % set parameter 
 %%%%%%%%%%%%%%%%
 Nt = 7;          % number of training frames per package
-Nl = 50;         % number of data frames per package
+Nl = 90;         % number of data frames per package
 M = 4;           % QAM constellation order
 
 % % parameters for channel 1
@@ -88,55 +88,58 @@ y_pack_cut = reshape(permute(...        % consecutive packages
 y_pack = [zeros(1,Nf_tot); y_pack_cut; zeros(1,Nf_tot);...
     flipud(conj(y_pack_cut))];          % consecutive packages ofdm
 
-% ofdm modulation
-[y_ofdm, y_ifft] = ofdm_mod(y_pack, Ncp);
+for k=0:Np_tot-1,
+    % ofdm modulation
+    y_single_pack = y_pack(:,k*(Nt+Nl)+1:(k+1)*(Nt+Nl));
+    [y_ofdm, y_ifft] = ofdm_mod(y_single_pack, Ncp);
 
-% transmission of the data
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% chose one of the three different channel types:
+    % transmission of the data
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % chose one of the three different channel types:
 
-% 1. real acoustic channel
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % prepare signal to transmit
-% y_ofdm_z = [zeros(1, t_init) y_ofdm zeros(1, t_delay)];
-% t_sim = (length(y_ofdm_z)-1)/fs;
-% t_arr = 0:1/fs:t_sim;
-% data_in = [t_arr' y_ofdm_z'];
+    % 1. real acoustic channel
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % % prepare signal to transmit
+    % y_ofdm_z = [zeros(1, t_init) y_ofdm zeros(1, t_delay)];
+    % t_sim = (length(y_ofdm_z)-1)/fs;
+    % t_arr = 0:1/fs:t_sim;
+    % data_in = [t_arr' y_ofdm_z'];
 
-% % send through the channel
-% sim('audio_io.mdl');
+    % % send through the channel
+    % sim('audio_io.mdl');
 
-% get the actual signal
-% n_lvl_max = max(data_out(t_init:t_init+t_delay/2));
-% data_idx_max = find(data_out(t_init:end) > 3*n_lvl_max);
-% n_lvl_min = min(data_out(t_init:t_init+t_delay/2));
-% data_idx_min = find(data_out(t_init:end) < 3*n_lvl_min);
-% data_out_cut = data_out(t_init+min(data_idx_max(1),data_idx_min(1)):...
-%     t_init+max(data_idx_max(end),data_idx_min(end)));
-% 
-% % adapt due to frequency difference
-% data_out_cut = data_out_cut(1:length(y_ofdm));
+    % get the actual signal
+    % n_lvl_max = max(data_out(t_init:t_init+t_delay/2));
+    % data_idx_max = find(data_out(t_init:end) > 3*n_lvl_max);
+    % n_lvl_min = min(data_out(t_init:t_init+t_delay/2));
+    % data_idx_min = find(data_out(t_init:end) < 3*n_lvl_min);
+    % data_out_cut = data_out(t_init+min(data_idx_max(1),data_idx_min(1)):...
+    %     t_init+max(data_idx_max(end),data_idx_min(end)));
+    % 
+    % % adapt due to frequency difference
+    % data_out_cut = data_out_cut(1:length(y_ofdm));
 
-% 2. time variant simulated acoustic channel
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% send through the channel
-data_out_cut = acoustic_channel_tv(y_ofdm');
+    % 2. time variant simulated acoustic channel
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % send through the channel
+    data_out_cut = acoustic_channel_tv(y_ofdm');
 
-% 3. simple simulated random channel
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % add noise
-% y_n = awgn(y_ofdm, inf);
-% 
-% % add channel characteristics
-% coeff = randn(1,L);
-% data_out_cut = filter(coeff, 1, y_n);
+    % 3. simple simulated random channel
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % % add noise
+    % y_n = awgn(y_ofdm, inf);
+    % 
+    % % add channel characteristics
+    % coeff = randn(1,L);
+    % data_out_cut = filter(coeff, 1, y_n);
 
-% ofdm demodulation
-%%%%%%%%%%%%%%%%%%%%
-[y_demod_ofdm, y_resh, y_cut] = ofdm_demod(data_out_cut, Nn, Nl, Ncp);
+    % ofdm demodulation
+    %%%%%%%%%%%%%%%%%%%%
+    [y_demod_ofdm, y_resh, y_cut] = ofdm_demod(data_out_cut, Nn, Nl, Ncp);
 
-% equalize
-y_comp = eq_mmse(y_demod_ofdm, y_block_t, Nn, Nt, Nl);
+    % equalize
+    y_comp(:,k*Nl+1:(k+1)*Nl) = eq_mmse_loop(y_demod_ofdm, y_fram_t, Nn, Nt, Nl);
+end
 
 % qam demodulation
 %%%%%%%%%%%%%%%%%%%
